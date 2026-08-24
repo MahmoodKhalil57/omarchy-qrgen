@@ -26,12 +26,13 @@ function defaults() {
     compress: false,
     compressTarget: "hamr",
     compressEmoji: false,
-    // Correction and quiet zone are internal to the code, so a measured value
-    // beats one nobody chose. Compression is not internal — it rewrites the
-    // link into a redirect through someone else's domain — so it is opt in.
+    // All three measured rather than guessed at. Compression is the one with a
+    // consequence outside the code — it rewrites the link into a redirect
+    // through ha.mr — so the panel always says when it has done so, and the
+    // switch is right there to turn off.
     correctionAuto: true,
     marginAuto: true,
-    compressAuto: false
+    compressAuto: true
   }
 }
 

@@ -69,7 +69,7 @@ Panel {
   // manual value underneath is kept, so turning automatic off returns to it.
   property bool correctionAuto: setting("correctionAuto", true) === true
   property bool marginAuto: setting("marginAuto", true) === true
-  property bool compressAuto: setting("compressAuto", false) === true
+  property bool compressAuto: setting("compressAuto", true) === true
 
   property string level: Model.normalizedLevel(setting("level", "M"), "M")
   property int margin: Math.round(Model.clamp(setting("margin", 4), 0, 16))

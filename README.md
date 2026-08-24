@@ -9,7 +9,30 @@ checks that what it drew actually scans.
 Left click opens it with the link field focused. Escape, or a click outside,
 closes it.
 
-## Nothing to install
+## Install
+
+```sh
+omarchy plugin add https://github.com/MahmoodKhalil57/omarchy-qrgen --enable
+```
+
+That clones it into `~/.config/omarchy/plugins/`, registers it, and puts the
+icon in the bar. `omarchy bar move mahmoodkhalil57.qrgen --section right` moves
+it; the shell picks up changes without a restart.
+
+To update: `omarchy plugin update mahmoodkhalil57.qrgen`.
+
+## Remove
+
+```sh
+omarchy plugin remove mahmoodkhalil57.qrgen
+```
+
+That takes the icon out of the bar and deletes the plugin directory. Nothing is
+left behind anywhere else: the plugin writes only its own entry in
+`~/.config/omarchy/shell.json`, which goes with it, and saved codes are ordinary
+files in `~/Pictures` that are yours to keep or delete.
+
+## How it runs
 
 The generator runs inside the shell's own JavaScript engine. There is no build
 step, no `node_modules`, no daemon and no subprocess: a code takes about twenty
@@ -75,10 +98,11 @@ produce a handsome unscannable code gets compressed into one that works:
 ha.mr · 37×37 instead of 45×45 · keeps the asset off the centre alignment pattern
 ```
 
-Automatic error correction and quiet zone are on by default; both are internal
-to the code, and a measured value beats one nobody chose. Automatic compression
-is off by default — it rewrites your link into a redirect through someone else's
-domain, which is a decision to opt into rather than inherit.
+All three are on by default. Compression is the one with a consequence outside
+the code — a compressed link is a redirect through [ha.mr](https://ha.mr), so it
+is only as durable as that service — which is why the panel always states what
+it chose and why, and the switch to turn it off is right beside the answer. It
+only ever turns compression on when doing so makes a genuinely smaller code.
 
 ## Codes that do not scan
 
@@ -113,7 +137,7 @@ is remembered too.
   "id": "mahmoodkhalil57.qrgen",
   "correctionAuto": true,
   "marginAuto": true,
-  "compressAuto": false,
+  "compressAuto": true,
   "siteRoot": "",
   "assetDirs": "~/Pictures\n~/Downloads"
 }
