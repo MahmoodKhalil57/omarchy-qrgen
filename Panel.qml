@@ -138,6 +138,10 @@ Panel {
 
   // The asset, inlined. Reading a file is the one thing QML cannot do for
   // itself here, so it is done once per asset rather than once per render.
+  //
+  // bin/qrgen-asset caps what it will read at 2 MiB; base64 is four thirds of
+  // that, plus the "data:image/…;base64," it arrives with.
+  readonly property int assetDataUriLimit: Math.ceil(2 * 1024 * 1024 / 3) * 4 + 64
   property string assetDataUri: ""
   property string assetLoadedFor: ""
 
@@ -245,11 +249,24 @@ Panel {
     root.scanWarning = ""
   }
 
+  // The largest payload any QR version and mode can hold — numeric, version 40,
+  // level L. Past this no code exists at all, so nothing downstream should be
+  // asked to try: not the encoder, and not the compressor, which would happily
+  // spend a second on a megabyte of pasted text before anyone could use it.
+  readonly property int maxPayload: 7089
+
   function render() {
     loadRegistries()
 
     var link = String(root.link).trim()
     if (link === "") { clearPreview(); return }
+
+    if (link.length > root.maxPayload) {
+      clearPreview()
+      root.error = "That is longer than any QR code can hold (" + link.length
+        + " characters, limit " + root.maxPayload + ")"
+      return
+    }
 
     // Both of these answer asynchronously and re-enter here when they land.
     if (root.assetPath !== "" && root.assetLoadedFor !== root.assetPath) { loadAsset(); return }
@@ -296,7 +313,11 @@ Panel {
   function loadAsset() {
     if (assetProc.running) return
     assetProc.wanted = root.assetPath
-    assetProc.command = ["base64", "-w", "0", "--", root.assetPath]
+    // Never base64 the path directly: it can come from a stored setting as
+    // easily as from the picker, and this shell process is shared with the bar
+    // and everything else on it. qrgen-asset does the judging, bounds the read,
+    // and hands back a finished data URI or a reason.
+    assetProc.command = [root.pluginDir + "bin/qrgen-asset", root.assetPath]
     assetProc.running = true
   }
 
@@ -409,6 +430,7 @@ Panel {
     id: assetProc
     property string wanted: ""
     property string encoded: ""
+    property string reason: ""
     property bool streamed: false
     property bool exited: false
     property int code: -1
@@ -420,18 +442,23 @@ Panel {
 
       var path = assetProc.wanted
       var data = assetProc.encoded
+      var why = assetProc.reason
       assetProc.encoded = ""
+      assetProc.reason = ""
 
       if (assetProc.code !== 0 || data === "") {
-        root.error = "Could not read " + path
+        root.error = why !== "" ? why : "Could not read that asset"
         return
       }
-      var mime = Model.mimeForPath(path)
-      if (mime === "") {
-        root.error = "That asset is not an image type the renderer can embed"
+
+      // The reader caps what it emits, so this only ever fires if that cap has
+      // been changed without this one: a belt to its braces, not a substitute.
+      if (data.length > root.assetDataUriLimit || data.indexOf("data:image/") !== 0) {
+        root.error = "That asset came back malformed or too large"
         return
       }
-      root.assetDataUri = "data:" + mime + ";base64," + data
+
+      root.assetDataUri = data
       root.assetLoadedFor = path
       root.render()
     }
@@ -443,6 +470,11 @@ Panel {
         assetProc.streamed = true
         assetProc.settle()
       }
+    }
+
+    stderr: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: assetProc.reason = String(text || "").trim().split("\n")[0]
     }
 
     onExited: function(exitCode) {

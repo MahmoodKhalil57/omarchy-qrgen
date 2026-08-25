@@ -61,21 +61,6 @@ function clamp(value, low, high) {
 
 function modulesFor(version) { return version * 4 + 17 }
 
-// What an asset gets inlined as. The renderer puts it straight into an
-// <image href>, so an unrecognised extension is better refused than guessed at.
-var MIME = {
-  png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif",
-  webp: "image/webp", svg: "image/svg+xml", bmp: "image/bmp", ico: "image/x-icon",
-  avif: "image/avif"
-}
-
-function mimeForPath(path) {
-  var name = String(path || "")
-  var dot = name.lastIndexOf(".")
-  if (dot === -1) return ""
-  return MIME[name.substring(dot + 1).toLowerCase()] || ""
-}
-
 // Above version 6 a centre asset starts landing on the middle alignment
 // pattern. That is structure rather than payload, so no amount of error
 // correction puts it back and the code simply stops scanning. When there is an
@@ -282,7 +267,6 @@ if (typeof module !== "undefined") {
   module.exports = {
     defaults: defaults, correctionLevels: correctionLevels, normalizedLevel: normalizedLevel,
     clamp: clamp, plan: plan, renderOptions: renderOptions, describe: describe,
-    mimeForPath: mimeForPath,
     describeCorrection: describeCorrection, describeMargin: describeMargin,
     describeCompression: describeCompression
   }

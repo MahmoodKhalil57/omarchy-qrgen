@@ -15,7 +15,9 @@ selection_file=${2:-}
 [[ -e $done_file ]] || exit 3        # the picker is still up
 [[ -s $selection_file ]] || exit 4   # dismissed without choosing
 
-path=$(head -n 1 "$selection_file")
+# Bounded: the picker writes one path, but this file is only as trustworthy as
+# whatever last wrote to it, and a single enormous line is still enormous.
+path=$(head -c 4096 -- "$selection_file" | head -n 1)
 [[ -n $path && -f $path ]] || exit 5 # chose something that is not there any more
 
 printf '%s\n' "$path"
