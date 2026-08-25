@@ -13,7 +13,9 @@ file is kept alongside the code it covers.
 codes with the app's own shape registries, colour handling and centre-asset
 geometry rather than a reimplementation that would drift from them.
 
-Rebuild it with `bin/build-renderer [path-to-qrgen-checkout]`.
+The script that builds it lives in the qrgen repository under `tools/`, beside
+the source it bundles — this repository ships the built file and nothing that
+builds it, so installing the plugin never involves a toolchain.
 
 ## lean-qr — MIT, © David Evans
 

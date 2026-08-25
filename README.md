@@ -116,7 +116,7 @@ backgrounds do not trip it, and it stays quiet where there is no decoder.
 
 ## Link compression
 
-Optional, off by default, and the only part that needs a runtime installed. It
+Optional, and the only part that needs a runtime present. It
 compresses the link with [ha.mr](https://ha.mr) and encodes a short redirect
 instead of the URL — a smaller code, at the cost of a link that only works while
 that redirector does.
@@ -158,21 +158,16 @@ omarchy-shell mahmoodkhalil57.qrgen level H                # L | M | Q | H
 `encode` is the one worth a keybinding — it makes "QR the link I just copied" a
 single keystroke.
 
-## Building the bundle
+## Rebuilding renderer.js
 
-Only needed if you are changing the generator itself.
+`renderer.js` is a committed build artefact — bundling the generator from
+[qrgen](https://github.com/MahmoodKhalil57/qrgen) so the panel draws codes with
+the app's own shape registries and geometry rather than a reimplementation.
 
-```sh
-bun install --cwd ~/Projects/qrgen        # once
-bin/build-renderer ~/Projects/qrgen       # rewrites renderer.js
-```
-
-The path is wherever your qrgen checkout is; with no argument it looks in
-`~/Projects/qrgen`. bun and tsc are needed to build, never to run.
-
-The script explains what it does to the bundle and why; the short version is
-that QML's JavaScript engine is not a browser, and three specific accommodations
-are needed. See `bin/build-renderer` and `THIRD-PARTY.md`.
+The script that produces it lives with the source it bundles, in that repository
+under `tools/`, not here: this plugin ships the built file and nothing that
+builds it, so installing it never involves a toolchain. See `THIRD-PARTY.md` for
+what goes into the bundle and what is done to it.
 
 ## Licence
 

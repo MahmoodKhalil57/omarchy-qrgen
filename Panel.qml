@@ -491,7 +491,7 @@ Panel {
         // No JavaScript runtime. Remember it: retrying per keystroke would
         // spawn a process a second to be told the same thing.
         root.compressUnavailable = parsed && parsed.error
-          ? String(parsed.error) : "Link compression needs node or bun installed"
+          ? String(parsed.error) : "Link compression needs Node.js or Bun on PATH"
         root.render()
         return
       }
@@ -1121,7 +1121,7 @@ Panel {
               Layout.fillWidth: true
             }
 
-            // The only part of the plugin that needs something installed, so it
+            // The only part of the plugin that needs anything on PATH, so it
             // says which thing rather than just refusing.
             Text {
               visible: root.compressUnavailable !== "" && root.wantsCompression

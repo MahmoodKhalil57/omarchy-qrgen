@@ -29,7 +29,7 @@ if [[ -z $runtime ]]; then
 fi
 
 if [[ -z $runtime ]]; then
-  echo '{"ok":false,"error":"Link compression needs node or bun installed"}'
+  echo '{"ok":false,"error":"Link compression needs Node.js or Bun on PATH"}'
   exit 127
 fi
 
